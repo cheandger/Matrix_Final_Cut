@@ -4,7 +4,7 @@ import java.util.concurrent.Semaphore;
 import java.util.logging.SocketHandler;
 
 public class RunMultiplier {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception{
 
         Matrix matrixA = new Matrix(4, 5);
         matrixA.RandomMatrix();

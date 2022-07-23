@@ -1,4 +1,4 @@
-class MultipleMatrixThread extends Thread{;
+class MultipleMatrixThread extends Thread{
 
     public  final Matrix matrix_A;
     public  final Matrix  matrix_B;
@@ -18,32 +18,42 @@ class MultipleMatrixThread extends Thread{;
     }
 
 
-        public void calcValue(Integer row, Integer col)
+        public Integer [] calcLine(Integer row, Integer col)
         {
             Integer sum = 0;
             for (Integer i = 0; i < sumLength; ++i)
                 sum += matrix_A.getMatrix()[row][i] * matrix_B.getMatrix()[i][col];
-            matrix_Result.getMatrix()[row][col] = sum;
+           return new Integer[]{matrix_Result.getMatrix()[row][col] = sum};
         }
 
 
     @Override
-    public void run()
-    {
+    public void run(){
+        multiple();
+    }
+
+    public Matrix multiple() {
+        Integer rowCount = matrix_A.getMatrix().length;             // количество строк матрицы-результата.
+        Integer colCount = matrix_B.getMatrix()[0].length;          // количество столбцов матрицы-результата.
+
+        final Matrix result = new Matrix(rowCount, colCount);//создаем матрицу нужного размера для результата умножения;
+
         System.out.println("Thread " + getName() + " Has started just now. It's calculating cells from " + firstIndex + " to " + lastIndex + "...");
 
-       Integer colCount = matrix_B.getMatrix()[0].length;  // количество столбцов матрицы - результата;
-        for (Integer index = firstIndex; index < lastIndex; ++index){
-            calcValue(index / colCount, index % colCount);
-       }
+        for (Integer index = firstIndex; index < lastIndex; ++index) {
 
+            result.getMatrix()[firstIndex] = calcLine(index / colCount, index % colCount);
+        }
         System.out.println("Thread " + getName() + " is finished.");
+        return result;
     }
 
 
 
-    public static Matrix multiplyMatrixMT(Matrix matrix_A,
-                                               Matrix matrix_B)
+
+
+    public static Matrix multiplyMatrixMT (Matrix matrix_A,
+                                               Matrix matrix_B) throws Exception
     {
         if (matrix_A == null || matrix_A.length == 0 || matrix_A.getMatrix()[0] == null || matrix_A.getMatrix()[0].length == 0) {
             throw new IllegalArgumentException("matrix_A is wrong");
@@ -58,7 +68,7 @@ class MultipleMatrixThread extends Thread{;
 
          Integer rowCount = matrix_A.getMatrix().length;             // количество строк матрицы-результата.
          Integer colCount = matrix_B.getMatrix()[0].length;         // количество столбцов матрицы-результата.
-         Matrix result = new Matrix(rowCount,colCount);//Результат умножения.
+         Matrix result = new Matrix(rowCount,colCount);//создаем матрицу нужного размера для результата умножения;
         final Integer cellsForThread = matrix_B.getMatrix()[0].length;
 
 
