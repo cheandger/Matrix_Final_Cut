@@ -1,48 +1,38 @@
-import jdk.swing.interop.DropTargetContextWrapper;
+class MultipleMatrixThread extends Thread{;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-public class MultipleMatrixThread extends Thread{
-
-
-
-
-
-    public final Integer [][] matrix_A;
-    public  final Integer [][] matrix_B;
-    public  final Integer [][] matrix_Result;
+    public  final Matrix matrix_A;
+    public  final Matrix  matrix_B;
+    public final Matrix matrix_Result;
     public  final Integer firstIndex;
     public  final Integer lastIndex;
-    public  final Integer resultMatrixLength;
+    public  Integer sumLength;
 
-
-    public MultipleMatrixThread(Integer[][] matrix_A,
-                                Integer[][] matrix_B,
-                                Integer[][] matrix_Result,
-                                Integer firstIndex,
-                                Integer lastIndex) {
+    public MultipleMatrixThread(Matrix matrix_A, Matrix matrix_B, Matrix matrix_Result,
+                                Integer firstIndex, Integer lastIndex) {
         this.matrix_A = matrix_A;
         this.matrix_B = matrix_B;
         this.matrix_Result = matrix_Result;
         this.firstIndex = firstIndex;
         this.lastIndex = lastIndex;
-        resultMatrixLength = matrix_B.length;
+        this.sumLength = matrix_B.length;
     }
-    public void calcValue(Integer row, Integer col)
-    {
-        Integer sum = 0;
-        for (Integer i = 0; i < resultMatrixLength; ++i)
-            sum += matrix_A[row][i] * matrix_B[i][col];
-        matrix_Result[row][col] = sum;
-    }
+
+
+        public void calcValue(Integer row, Integer col)
+        {
+            Integer sum = 0;
+            for (Integer i = 0; i < sumLength; ++i)
+                sum += matrix_A.getMatrix()[row][i] * matrix_B.getMatrix()[i][col];
+            matrix_Result.getMatrix()[row][col] = sum;
+        }
+
 
     @Override
     public void run()
     {
         System.out.println("Thread " + getName() + " Has started just now. It's calculating cells from " + firstIndex + " to " + lastIndex + "...");
 
-        final Integer colCount = matrix_B[0].length;  // количество столбцов матрицы - результата;
+       Integer colCount = matrix_B.getMatrix()[0].length;  // количество столбцов матрицы - результата;
         for (Integer index = firstIndex; index < lastIndex; ++index){
             calcValue(index / colCount, index % colCount);
        }
@@ -52,31 +42,31 @@ public class MultipleMatrixThread extends Thread{
 
 
 
-    public static Integer[][] multiplyMatrixMT(Integer[][] matrix_A,
-                                               Integer[][] matrix_B, Integer threadCount)
+    public static Matrix multiplyMatrixMT(Matrix matrix_A,
+                                               Matrix matrix_B)
     {
-        if (matrix_A == null || matrix_A.length == 0 || matrix_A[0] == null || matrix_A[0].length == 0) {
+        if (matrix_A == null || matrix_A.length == 0 || matrix_A.getMatrix()[0] == null || matrix_A.getMatrix()[0].length == 0) {
             throw new IllegalArgumentException("matrix_A is wrong");
         }
-        if (matrix_B == null || matrix_B.length == 0 || matrix_B[0] == null || matrix_B[0].length == 0) {
+        if (matrix_B == null || matrix_B.length == 0 || matrix_B.getMatrix()[0] == null || matrix_B.getMatrix()[0].length == 0) {
             throw new IllegalArgumentException("matrix_B is wrong");
         }
-        if (matrix_A[0].length != matrix_B.length) {
+        if (matrix_A.getMatrix()[0].length != matrix_B.length) {
             throw new IllegalArgumentException("matrices are inconsistent");
         }
 
 
-         Integer rowCount = matrix_A.length;             // количество строк матрицы-результата.
-         Integer colCount = matrix_B[0].length;         // количество столбцов матрицы-результата.
-         Integer[][] result = new Integer[rowCount][colCount];//Результат умножения.
-        final int cellsForThread = (rowCount * colCount) / threadCount;
+         Integer rowCount = matrix_A.getMatrix().length;             // количество строк матрицы-результата.
+         Integer colCount = matrix_B.getMatrix()[0].length;         // количество столбцов матрицы-результата.
+         Matrix result = new Matrix(rowCount,colCount);//Результат умножения.
+        final Integer cellsForThread = matrix_B.getMatrix()[0].length;
 
 
         Integer firstIndex = 0;  // Индекс первой ячейки.
-         MultipleMatrixThread[] multiplierThreads = new MultipleMatrixThread[threadCount];  // Массив потоков (Чтобы создавать потоки в необходимом количестве).
+         MultipleMatrixThread[] multiplierThreads = new MultipleMatrixThread[ matrix_B.getMatrix()[0].length];  // Массив потоков (Чтобы создавать потоки в необходимом количестве).
 
         // Создание и запуск потоков.
-        for (Integer threadIndex = threadCount - 1; threadIndex >= 0; --threadIndex) {
+        for (Integer threadIndex =  matrix_B.getMatrix()[0].length ; threadIndex > 0; --threadIndex) {
             Integer lastIndex = firstIndex + cellsForThread;  // Индекс последней вычисляемой ячейки.
 
             multiplierThreads[threadIndex] = new MultipleMatrixThread(matrix_A, matrix_B, result, firstIndex, lastIndex);
