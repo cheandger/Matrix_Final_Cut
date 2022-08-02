@@ -1,60 +1,27 @@
-class MultipleMatrixThread extends Thread{
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.Semaphore;
 
-    public  final Matrix matrix_A;
-    public  final Matrix  matrix_B;
+class MultipleMatrixThread {            // Класс умножалка
+
+    public final Matrix matrix_A;
+    public final Matrix matrix_B;
     public final Matrix matrix_Result;
-    public  final Integer firstIndex;
-    public  final Integer lastIndex;
-    public  Integer sumLength;
+    public Integer rowIndex;
+    private int threadSize;    //Пока не понял как прикрутить семафор или щеколду, поэтому пусть просто полежит
 
-    public MultipleMatrixThread(Matrix matrix_A, Matrix matrix_B, Matrix matrix_Result,
-                                Integer firstIndex, Integer lastIndex) {
+
+    public MultipleMatrixThread(Matrix matrix_A, Matrix matrix_B) {
         this.matrix_A = matrix_A;
         this.matrix_B = matrix_B;
-        this.matrix_Result = matrix_Result;
-        this.firstIndex = firstIndex;
-        this.lastIndex = lastIndex;
-        this.sumLength = matrix_B.length;
+        this.rowIndex = 0;
+        this.matrix_Result = new Matrix(matrix_A.getMatrix().length, matrix_B.getMatrix()[0].length);
+        this.threadSize = matrix_A.getMatrix().length;
     }
 
 
-        public Integer [] calcLine(Integer row, Integer col)
-        {
-            Integer sum = 0;
-            for (Integer i = 0; i < sumLength; ++i)
-                sum += matrix_A.getMatrix()[row][i] * matrix_B.getMatrix()[i][col];
-           return new Integer[]{matrix_Result.getMatrix()[row][col] = sum};
-        }
+    public void multiplyMatrixMT() throws InterruptedException {   //Собственно сам метод, сначала проверяем условия
 
-
-    @Override
-    public void run(){
-        multiple();
-    }
-
-    public Matrix multiple() {
-        Integer rowCount = matrix_A.getMatrix().length;             // количество строк матрицы-результата.
-        Integer colCount = matrix_B.getMatrix()[0].length;          // количество столбцов матрицы-результата.
-
-        final Matrix result = new Matrix(rowCount, colCount);//создаем матрицу нужного размера для результата умножения;
-
-        System.out.println("Thread " + getName() + " Has started just now. It's calculating cells from " + firstIndex + " to " + lastIndex + "...");
-
-        for (Integer index = firstIndex; index < lastIndex; ++index) {
-
-            result.getMatrix()[firstIndex] = calcLine(index / colCount, index % colCount);
-        }
-        System.out.println("Thread " + getName() + " is finished.");
-        return result;
-    }
-
-
-
-
-
-    public static Matrix multiplyMatrixMT (Matrix matrix_A,
-                                               Matrix matrix_B) throws Exception
-    {
         if (matrix_A == null || matrix_A.length == 0 || matrix_A.getMatrix()[0] == null || matrix_A.getMatrix()[0].length == 0) {
             throw new IllegalArgumentException("matrix_A is wrong");
         }
@@ -65,43 +32,47 @@ class MultipleMatrixThread extends Thread{
             throw new IllegalArgumentException("matrices are inconsistent");
         }
 
-
-         Integer rowCount = matrix_A.getMatrix().length;             // количество строк матрицы-результата.
-         Integer colCount = matrix_B.getMatrix()[0].length;         // количество столбцов матрицы-результата.
-         Matrix result = new Matrix(rowCount,colCount);//создаем матрицу нужного размера для результата умножения;
-        final Integer cellsForThread = matrix_B.getMatrix()[0].length;
+        //Thread[] threadList = new Thread[matrix_A.length];//раньше делал по примеру предыдущих поколений с массивом потоков, потом сделал через очередь
+        Queue<Thread> threadQueue = new LinkedList<>();
 
 
-        Integer firstIndex = 0;  // Индекс первой ячейки.
-         MultipleMatrixThread[] multiplierThreads = new MultipleMatrixThread[ matrix_B.getMatrix()[0].length];  // Массив потоков (Чтобы создавать потоки в необходимом количестве).
+        for (Integer threadCount = 0; threadCount < matrix_A.length; threadCount++) {//создаем потоки, в которых будем считать ряды матрицы
 
-        // Создание и запуск потоков.
-        for (Integer threadIndex =  matrix_B.getMatrix()[0].length ; threadIndex > 0; --threadIndex) {
-            Integer lastIndex = firstIndex + cellsForThread;  // Индекс последней вычисляемой ячейки.
+            threadQueue.add(new CalcThread(rowIndex, matrix_Result, matrix_A, matrix_B));
+            // Собственно экземпляр потока с индексом номера ряда,
+            //каждый поток будет считать свой ряд
 
-            multiplierThreads[threadIndex] = new MultipleMatrixThread(matrix_A, matrix_B, result, firstIndex, lastIndex);
-
-            multiplierThreads[threadIndex].start();
-            firstIndex = lastIndex;
+            rowIndex++;//а вот здесь мы счетчик рядов прикрутим;
 
         }
+        ;
+        for (Thread thread : threadQueue) {//Старутем и джойнимся, чтобы все отработало, а то консоль субординацию не блюдет и печатает первой...
+            thread.start();
+            thread.join();
 
-        // Ожидание завершения потоков.
-        try {
-            for (MultipleMatrixThread multiplierThread : multiplierThreads) {
-
-                multiplierThread.join();
+          //  try{CalcThread.downLatch.await();} catch (InterruptedException e) {// так и не понял,что лучше использовать щеколду или барьеры,
+                                                                                 //пока метод join(), потом посмотрим;
+              //  e.printStackTrace();
             }
-        }
-        catch (InterruptedException exception) {
-            System.out.println(exception);
+          //  CalcThread.getDownLatch().countDown();
         }
 
-        return result;
     }
 
 
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

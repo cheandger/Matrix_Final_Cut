@@ -1,16 +1,23 @@
-import java.sql.Array;
-import java.util.Arrays;
-import java.util.concurrent.Semaphore;
-import java.util.logging.SocketHandler;
-
 public class RunMultiplier {
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws InterruptedException{
 
         Matrix matrixA = new Matrix(4, 5);
         matrixA.RandomMatrix();
         Matrix matrixB = new Matrix(5, 6);
         matrixB.RandomMatrix();
-       /* Semaphore semaphore = new Semaphore(matrixA.getMatrix().length);
+
+       MultipleMatrixThread multipleMatrixThread = new MultipleMatrixThread(matrixA,matrixB);
+
+        System.out.println(matrixA);
+        System.out.println(matrixB);
+     multipleMatrixThread.multiplyMatrixMT();
+        System.out.println(multipleMatrixThread.matrix_Result);
+
+
+
+
+
+        /* Semaphore semaphore = new Semaphore(matrixA.getMatrix().length);
 
         for (Integer i = matrixA.getMatrix().length; i<matrixA.getMatrix().length; i--){
             new Thread(){
@@ -21,10 +28,11 @@ public class RunMultiplier {
                     }
                 }
             };*/
-        System.out.println(matrixA);
-        System.out.println(matrixB);
+       ;
 
-        MultipleMatrixThread.multiplyMatrixMT(matrixA,matrixB);
+
+
+      // MultipleMatrixThread.multiplyMatrixMT(matrixA,matrixB);
     }
 
 }

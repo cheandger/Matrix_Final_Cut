@@ -1,12 +1,11 @@
 import java.util.Arrays;
 
 
-public class Matrix  {
+public class Matrix  {                      //описываем класс матрицы
     private final Integer [][] matrix;
+    public Integer length;
 
-   public Integer length;
-   public static Integer row;
-   public static Integer col;
+
 
 
     public Matrix(Integer row, Integer col) {
@@ -14,23 +13,19 @@ public class Matrix  {
         this.matrix = new Integer[row][col];
         this.length = this.matrix.length;
 
+
     }
 
-    public Integer[][] getMatrix() {
-        return matrix;
+    public Integer[][] getMatrix() { // Геттер матрицы, чтобы щупать ее за всякое
+        return this.matrix;
     }
 
-    public static Integer getRow() {
-        return row;
-    }
 
-    public static Integer getCol() {
-        return col;
-    }
+
 
     public void RandomMatrix(){
 
-        for (Integer i=0; i<this.matrix.length;i++){
+        for (Integer i=0; i<this.matrix.length;i++){                           //заполняем матрицу случайными значениями
             for (Integer j = 0; j<this.matrix[0].length;j++){
                 Integer random = new java.util.Random().nextInt(500);
                 matrix[i][j]=random;}
@@ -38,7 +33,7 @@ public class Matrix  {
     }
 
     @Override
-  public String toString(){
+  public String toString(){                              //переопределяем toString
 
         for (Integer[] integers : this.matrix)
             System.out.println(Arrays.toString(integers));
