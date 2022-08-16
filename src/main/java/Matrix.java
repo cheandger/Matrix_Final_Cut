@@ -1,42 +1,127 @@
+import java.awt.*;
 import java.util.Arrays;
+import java.util.concurrent.*;
 
 
-public class Matrix  {                      //описываем класс матрицы
-    private final Integer [][] matrix;
-    public Integer length;
+class Matrix {                      //описываем класс матрицы
+    private final Integer[][] matrix;
 
 
+    public Matrix(Integer[][] matrixArray) {
 
+       matrix = new Integer[matrixArray.length][matrixArray[0].length];
 
-    public Matrix(Integer row, Integer col) {
-
-        this.matrix = new Integer[row][col];
-        this.length = this.matrix.length;
-
-
-    }
-
-    public Integer[][] getMatrix() { // Геттер матрицы, чтобы щупать ее за всякое
-        return this.matrix;
-    }
-
-
-
-
-    public void RandomMatrix(){
-
-        for (Integer i=0; i<this.matrix.length;i++){                           //заполняем матрицу случайными значениями
-            for (Integer j = 0; j<this.matrix[0].length;j++){
-                Integer random = new java.util.Random().nextInt(500);
-                matrix[i][j]=random;}
+        for (Integer copyRow = 0; copyRow < matrixArray.length; copyRow++) {
+            for (Integer copyCol = 0; copyCol < matrixArray[0].length; copyCol++) {
+                matrix[copyRow][copyCol] = matrixArray[copyRow][copyCol];
+            }
         }
+
     }
+
+
+    public Integer getRow() {
+        return matrix.length;
+    }
+
+    public Integer getCol() {
+        return matrix[0].length;
+    }
+
+    public Integer[][] getMatrix(Matrix matrix) {
+        return this.matrix;//поидее в уч материалах говорят, что геттер должен быть аналогичен конструктору,
+        //но если мы просто читаем что-то по ссылке, и не пытаемся менять - хз зачем. Спросить у Дато!
+       /* matrix = new Integer[matrix.getRow()][matrix.getCol()]; //
+
+        for (Integer row = 0; row<matrix.getRow();row++){
+            for (Integer col=0;col< matrix.getCol();col++){
+                matrix[row][col] = deepCopy[row][col];
+            }
+        }
+      return deepCopy;*/
+    }
+
+
+    public Integer getLength() {
+        return matrix.length * matrix[0].length;
+    }
+
+
+    public static Integer[][] randomise2DArray(Integer[][] someMatrix) {
+
+
+        for (Integer i = 0; i < someMatrix.length; i++) {                           //Метод для заполненеия матрицы случайными значениями
+            for (Integer j = 0; j < someMatrix[0].length; j++) {                    // вдруг пригодится;
+                Integer random = new java.util.Random().nextInt(500);
+                someMatrix[i][j] = random;
+            }
+        }
+
+        return someMatrix;
+    }
+
+
+    public Matrix MultipleMatricesMT(Matrix matrix, Integer threadPoolSize) throws ExecutionException, InterruptedException, IllegalArgumentException{
+
+        if (this.matrix[0].length != matrix.getRow()) {
+            throw new IllegalArgumentException("matrices are inconsistent");
+        }
+
+        Integer[][] resultMatrix = new Integer[this.matrix.length][matrix.getCol()];
+
+
+        ExecutorService executorService = Executors.newFixedThreadPool(threadPoolSize);
+
+        for (Integer row = 0; row < this.matrix.length; row++){
+           for ( Integer col = 0; col < matrix.getCol();col++){
+
+               Integer innerRow = row;
+               Integer innerCol = col;
+
+
+
+               Integer calcThreadResult = executorService.submit(() -> {
+
+                   System.out.println("Thread " + Thread.currentThread().getName() + " Has started just now.");
+
+                   Integer sum = 0;
+                       for (Integer i = 0; i < matrix.getRow(); i++) {
+
+                           sum += getMatrix(Matrix.this)[innerRow][i] * matrix.getMatrix(matrix)[i][innerCol];
+                       }
+
+                       System.out.println("Thread " + Thread.currentThread().getName() + " finished.");
+
+                   return sum;
+
+               }).get();
+               resultMatrix[row][col]=calcThreadResult;
+
+            }
+        } executorService.shutdown();
+
+
+
+        return new Matrix(resultMatrix);}
+
+
 
     @Override
-  public String toString(){                              //переопределяем toString
+    public String toString() {
+        StringBuilder str = new StringBuilder();
+       for (Integer k = 0;k< matrix.length;k++){
 
-        for (Integer[] integers : this.matrix)
-            System.out.println(Arrays.toString(integers));
-        return "";
+        str.append("\n").append(Arrays.toString(matrix[k]));
+
+       }
+        return str.append("\n").toString();
     }
-}
+
+    }
+
+
+
+
+
+
+
