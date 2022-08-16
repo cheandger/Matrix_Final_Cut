@@ -5,12 +5,12 @@ public class RunMultiplier {
     public static void main(String[] args) throws InterruptedException, ExecutionException,IllegalArgumentException {
 
 
-       Matrix matrix1 = new Matrix(randomise2DArray(10,8));
+       Matrix matrix1 = new Matrix(randomise2DArray(10,8));//создаем матрицы
 
        Matrix matrix2= new Matrix(randomise2DArray(8,25));
-        System.out.println(matrix1);
+        System.out.println(matrix1);//печатаем
         System.out.println(matrix2);
-     try {  System.out.println(matrix1.MultipleMatricesMT(matrix2,3));
+     try {  System.out.println(matrix1.MultipleMatricesMT(matrix2,3)); //применяем метод
     } catch (IllegalArgumentException exception){
        System.out.println(exception);
      }

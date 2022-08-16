@@ -50,30 +50,32 @@ class Matrix {                      //описываем класс матриц
 
 
     public Matrix MultipleMatricesMT(Matrix matrix, Integer threadPoolSize) throws ExecutionException, InterruptedException, IllegalArgumentException{
-
+// метод умножения матриц
         if (this.matrix[0].length != matrix.getRow()) {
-            throw new IllegalArgumentException("matrices are inconsistent");
+            throw new IllegalArgumentException("matrices are inconsistent");// проверяем косистентность
         }
 
-        Integer[][] resultMatrix = new Integer[this.matrix.length][matrix.getCol()];
+        Integer[][] resultMatrix = new Integer[this.matrix.length][matrix.getCol()];//Создаем массив, где будем хранить результаты вычислений
+        // и с помощью которого потом будем инициализировать результат вычислений
 
 
-        ExecutorService executorService = Executors.newFixedThreadPool(threadPoolSize);
+        ExecutorService executorService = Executors.newFixedThreadPool(threadPoolSize); //запускаем ExecutorService
 
-        for (Integer row = 0; row < this.matrix.length; row++){
+        for (Integer row = 0; row < this.matrix.length; row++){//Бежим циклом по массиву результата вычислений и напихиваем его значениями
            for ( Integer col = 0; col < matrix.getCol();col++){
 
-               Integer innerRow = row;
+               Integer innerRow = row;//создаем служебные переменные, чтобы использовать их в потоке.
                Integer innerCol = col;
 
 
 
-               Integer calcThreadResult = executorService.submit(() -> {
+               Integer calcThreadResult = executorService.submit(() -> {//Сабмитим задачи в том же цикле(используем callable, но можно и runnable),
+                   //главное, чтобы можно было выдернуть возвращаемое значение с помощью get()
 
                    System.out.println("Thread " + Thread.currentThread().getName() + " Has started just now.");
 
                    Integer sum = 0;
-                       for (Integer i = 0; i < matrix.getRow(); i++) {
+                       for (Integer i = 0; i < matrix.getRow(); i++) {// в цикле рассчитываем значение каждой ячейки результирующей матрицы.
 
                            sum += getMatrix(Matrix.this)[innerRow][i] * matrix.getMatrix(matrix)[i][innerCol];
                        }
@@ -82,11 +84,11 @@ class Matrix {                      //описываем класс матриц
 
                    return sum;
 
-               }).get();
-               resultMatrix[row][col]=calcThreadResult;
+               }).get(); //достаем результаты вычисления
+               resultMatrix[row][col]=calcThreadResult;//добавляем в массив
 
             }
-        } executorService.shutdown();
+        } executorService.shutdown();//инициализируем массив и делаем из него матрицу
 
 
 
