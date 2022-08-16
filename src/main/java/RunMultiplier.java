@@ -5,9 +5,9 @@ public class RunMultiplier {
     public static void main(String[] args) throws InterruptedException, ExecutionException,IllegalArgumentException {
 
 
-       Matrix matrix1 = new Matrix(randomise2DArray(4,5));
+       Matrix matrix1 = new Matrix(randomise2DArray(10,8));
 
-       Matrix matrix2= new Matrix(randomise2DArray(5,6));
+       Matrix matrix2= new Matrix(randomise2DArray(8,25));
         System.out.println(matrix1);
         System.out.println(matrix2);
      try {  System.out.println(matrix1.MultipleMatricesMT(matrix2,3));

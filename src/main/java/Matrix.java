@@ -9,7 +9,8 @@ class Matrix {                      //описываем класс матриц
 
     public Matrix(Integer[][] matrixArray) {
 
-       matrix = new Integer[matrixArray.length][matrixArray[0].length];
+       matrix = new Integer[matrixArray.length][matrixArray[0].length];// чтобы экземпляр матрицы был иммутабельным(threadsafe того требует)
+                                                                        //делаем глубокую копию массива(ручками), это не объект и clone() здесь не проканает
 
         for (Integer copyRow = 0; copyRow < matrixArray.length; copyRow++) {
             for (Integer copyCol = 0; copyCol < matrixArray[0].length; copyCol++) {
@@ -22,7 +23,7 @@ class Matrix {                      //описываем класс матриц
 
     public Integer getRow() {
         return matrix.length;
-    }
+    }//геттеры, кудаж без них
 
     public Integer getCol() {
         return matrix[0].length;
@@ -46,19 +47,6 @@ class Matrix {                      //описываем класс матриц
         return matrix.length * matrix[0].length;
     }
 
-
-    public static Integer[][] randomise2DArray(Integer[][] someMatrix) {
-
-
-        for (Integer i = 0; i < someMatrix.length; i++) {                           //Метод для заполненеия матрицы случайными значениями
-            for (Integer j = 0; j < someMatrix[0].length; j++) {                    // вдруг пригодится;
-                Integer random = new java.util.Random().nextInt(500);
-                someMatrix[i][j] = random;
-            }
-        }
-
-        return someMatrix;
-    }
 
 
     public Matrix MultipleMatricesMT(Matrix matrix, Integer threadPoolSize) throws ExecutionException, InterruptedException, IllegalArgumentException{
