@@ -10,7 +10,7 @@ class Matrix {                      //описываем класс матриц
     public Matrix(Integer[][] matrixArray) {
 
        matrix = new Integer[matrixArray.length][matrixArray[0].length];// чтобы экземпляр матрицы был иммутабельным(threadsafe того требует)
-                                                                        //делаем глубокую копию массива(ручками), это не объект и clone() здесь не проканает
+                                                                        //делаем глубокую копию массива(ручками)
 
         for (Integer copyRow = 0; copyRow < matrixArray.length; copyRow++) {
             for (Integer copyCol = 0; copyCol < matrixArray[0].length; copyCol++) {
